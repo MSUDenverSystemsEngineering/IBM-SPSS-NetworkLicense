@@ -142,7 +142,7 @@ Try {
 		$version = Split-Path -path "$envProgramFiles\IBM\SPSS\Statistics\*" -Leaf -Resolve
 
 		(Get-Content "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf") `
-	    -replace '^DaemonHost=no-net$', 'DaemonHost=vmwas22.winad.msudenver.edu' |
+	    -replace 'DaemonHost=no-net', 'DaemonHost=vmwas22.winad.msudenver.edu' |
 	  	Set-Content -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf"
 
 		Remove-Item -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\lservrc" -ErrorAction SilentlyContinue
