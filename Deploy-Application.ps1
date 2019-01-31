@@ -145,7 +145,8 @@ Try {
 	    -replace '^DaemonHost=no-net$', 'DaemonHost=vmwas22.winad.msudenver.edu' |
 	  	Set-Content -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf"
 
-		Remove-Item -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\lservrc"
+		Remove-Item -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\lservrc" -ErrorAction SilentlyContinue
+		Set-RegistryKey -Key 'HKEY_LOCAL_MACHINE\SOFTWARE\MSUDenver' -Name 'SPSSNETWORK' -Value 'Yes'-Type String -ContinueOnError:$True
 
 		##*===============================================
 		##* POST-INSTALLATION
