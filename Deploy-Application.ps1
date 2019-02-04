@@ -139,14 +139,17 @@ Try {
 		}
 
 		## <Perform Installation tasks here>
-		$version = Split-Path -path "$envProgramFiles\IBM\SPSS\Statistics\*" -Leaf -Resolve
+		Get-ChildItem "$envProgramFiles\IBM\SPSS\Statistics\*" -Directory | ForEach-Object {
 
-		(Get-Content "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf") `
-	    -replace 'DaemonHost=no-net', 'DaemonHost=vmwas22.winad.msudenver.edu' |
-	  	Set-Content -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf"
-
-		Remove-Item -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\lservrc" -ErrorAction SilentlyContinue
-		Set-RegistryKey -Key 'HKEY_LOCAL_MACHINE\SOFTWARE\MSUDenver' -Name 'SPSSNETWORK' -Value 'Yes'-Type String -ContinueOnError:$True
+				$version = $_.Name
+        If(Test-Path "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf") {
+				    (Get-Content "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf") `
+			       -replace 'DaemonHost=no-net', 'DaemonHost=vmwas22.winad.msudenver.edu' |
+			  	   Set-Content -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf"
+             Remove-Item -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\lservrc" -ErrorAction SilentlyContinue
+          }
+			}
+		Set-RegistryKey -Key 'HKEY_LOCAL_MACHINE\SOFTWARE\MSUDenver' -Name 'SPSSNETWORK' -Value 'Yes'-Type String -ErrorAction SilentlyContinue
 
 		##*===============================================
 		##* POST-INSTALLATION
@@ -189,7 +192,17 @@ Try {
 
 		# <Perform Uninstallation tasks here>
 
+		Get-ChildItem "$envProgramFiles\IBM\SPSS\Statistics\*" -Directory | ForEach-Object {
 
+				$version = $_.Name
+				If(Test-Path "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf") {
+						(Get-Content "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf") `
+						 -replace 'DaemonHost=vmwas22.winad.msudenver.edu', 'DaemonHost=no-net' |
+						 Set-Content -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\spssprod.inf"
+						 Remove-Item -Path "$envProgramFiles\IBM\SPSS\Statistics\$version\lservrc" -ErrorAction SilentlyContinue
+					}
+			}
+			Remove-ItemProperty -Path 'HKLM:\SOFTWARE\MSUDenver' -Name "SPSSNETWORK" -ErrorAction SilentlyContinue
 		##*===============================================
 		##* POST-UNINSTALLATION
 		##*===============================================
